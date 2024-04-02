@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../result_type.dart';
 import '../data/auth_repository.dart';
@@ -58,6 +57,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onAuthenticateStarted(
       AuthAuthenticateStarted event, Emitter<AuthState> emit) async {
     final result = await authRepository.getToken();
+
+    if (result is Success) {
+
+    } else {
+      emit(AuthAuthenticateUnauthenticated());
+    }
     return (switch (result) {
       Success(data: final token) when token != null =>
         emit(AuthAuthenticateSuccess(token)),

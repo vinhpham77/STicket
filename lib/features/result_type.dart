@@ -11,5 +11,5 @@ class Failure<T> extends Result<T> {
 
   Failure(this.message);
 
-  Failure.fromException(Exception e) : message = e.toString().substring(11);
+  Failure.fromException(e) : message = e.toString().substring(11);
 }

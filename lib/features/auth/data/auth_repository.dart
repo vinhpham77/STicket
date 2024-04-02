@@ -27,9 +27,9 @@ class AuthRepository {
 
       await Future.wait([
         authLocalDataSource.saveToken(
-            loginSuccessDto.accessToken, AuthDataConstants.accessToken),
+            AuthDataConstants.accessToken, loginSuccessDto.accessToken),
         authLocalDataSource.saveToken(
-            loginSuccessDto.refreshToken, AuthDataConstants.refreshToken),
+            AuthDataConstants.refreshToken, loginSuccessDto.refreshToken),
       ]);
     } on Exception catch (e) {
       log('$e');

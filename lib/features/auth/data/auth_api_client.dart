@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:s_ticket/config/http_client.dart';
+import '../../result_type.dart';
 import '../dtos/login_dto.dart';
 import '../dtos/login_success_dto.dart';
 import '../dtos/register_dto.dart';
@@ -18,13 +21,15 @@ class AuthApiClient {
         data: loginDto.toJson(),
       );
 
-      return LoginSuccessDto.fromJson(response.data['data']);
+      return LoginSuccessDto.fromJson(response.data);
     } on DioException catch (e) {
-      if (e.response != null) {
-        throw Exception(e.response!.data['message']);
-      } else {
-        throw Exception(e.message);
-      }
+        if (e.response != null) {
+          throw Exception(e.response!.data['message']);
+        } else {
+          throw Exception(e.message);
+        }
+    } catch (e) {
+      throw Exception(e);
     }
   }
 
@@ -42,6 +47,8 @@ class AuthApiClient {
       } else {
         throw Exception(e.message);
       }
+    } catch (e) {
+      throw Exception(e);
     }
 
   }
