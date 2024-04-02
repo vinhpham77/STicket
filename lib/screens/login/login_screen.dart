@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -142,7 +143,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   _passwordFocusNode.requestFocus();
                 }
               },
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+              ],
               autofillHints: const [AutofillHints.username],
+              maxLength: 50,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
               decoration: InputDecoration(
                 labelText: 'Tên đăng nhập',
                 border: OutlineInputBorder(
@@ -154,7 +164,10 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Vui lòng nhập tên đăng nhập';
+                } else if (value.length < 6) {
+                  return 'Tên đăng nhập phải có ít nhất 6 ký tự';
                 }
+
                 return null;
               },
             ),
@@ -163,9 +176,16 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _passwordController,
               key: _passwordKey,
               focusNode: _passwordFocusNode,
+              keyboardType: TextInputType.visiblePassword,
               onFieldSubmitted: (_) {
                 _handleGo(context);
               },
+              maxLength: 50,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
               autofillHints: const [AutofillHints.newPassword],
               decoration: InputDecoration(
                 labelText: 'Mật khẩu',
@@ -190,6 +210,11 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Vui lòng nhập mật khẩu';
+                } else if (value.length < 8) {
+                  return 'Mật khẩu phải có ít nhất 8 ký tự';
+                } else if (!RegExp(r'[a-zA-Z]').hasMatch(value) ||
+                    !RegExp(r'[0-9]').hasMatch(value)) {
+                  return 'Mật khẩu phải chứa ít nhất 1 chữ cái và 1 chữ số';
                 }
                 return null;
               },

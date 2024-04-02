@@ -1,8 +1,6 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:s_ticket/config/http_client.dart';
-import '../../result_type.dart';
+
 import '../dtos/login_dto.dart';
 import '../dtos/login_success_dto.dart';
 import '../dtos/register_dto.dart';
@@ -14,7 +12,7 @@ class AuthApiClient {
 
   Future<LoginSuccessDto> login(LoginDto loginDto) async {
     try {
-      await setHeaders(dio);
+      await setDeviceInfo(dio);
 
       final response = await dio.post(
         '/auth/login',
@@ -23,11 +21,11 @@ class AuthApiClient {
 
       return LoginSuccessDto.fromJson(response.data);
     } on DioException catch (e) {
-        if (e.response != null) {
-          throw Exception(e.response!.data['message']);
-        } else {
-          throw Exception(e.message);
-        }
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
     } catch (e) {
       throw Exception(e);
     }
@@ -35,7 +33,7 @@ class AuthApiClient {
 
   Future<void> register(RegisterDto registerDto) async {
     try {
-      setHeaders(dio);
+      setDeviceInfo(dio);
 
       await dio.post(
         '/auth/register',
@@ -50,6 +48,24 @@ class AuthApiClient {
     } catch (e) {
       throw Exception(e);
     }
+  }
 
+  Future<void> logout(String refreshToken) async {
+    try {
+      setDeviceInfo(dio);
+
+      await dio.post(
+        '/auth/logout?apply=all',
+        data: refreshToken,
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }

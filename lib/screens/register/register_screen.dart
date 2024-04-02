@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   final _repeatPasswordFocusNode = FocusNode();
-  
+
   @override
   void initState() {
     super.initState();
@@ -142,7 +143,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextFormField(
               controller: _usernameController,
               key: _usernameKey,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+              ],
               focusNode: _usernameFocusNode,
+              maxLength: 50,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
               onEditingComplete: () {
                 if (_usernameKey.currentState!.validate()) {
                   _emailFocusNode.requestFocus();
@@ -160,7 +170,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Vui lòng nhập tên đăng nhập';
+                } else if (value.length < 6) {
+                  return 'Tên đăng nhập phải có ít nhất 6 ký tự';
                 }
+
                 return null;
               },
             ),
@@ -169,6 +182,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _emailController,
               key: _emailKey,
               focusNode: _emailFocusNode,
+              keyboardType: TextInputType.emailAddress,
+              maxLength: 50,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
               autofillHints: const [AutofillHints.email],
               onEditingComplete: () {
                 if (_emailKey.currentState!.validate()) {
@@ -204,6 +224,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               key: _passwordKey,
               focusNode: _passwordFocusNode,
               controller: _passwordController,
+              keyboardType: TextInputType.visiblePassword,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
               onEditingComplete: () {
                 if (_passwordKey.currentState!.validate()) {
                   _repeatPasswordFocusNode.requestFocus();
@@ -230,10 +256,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               obscureText: !_passwordVisible,
               enableSuggestions: false,
               autocorrect: false,
+              maxLength: 50,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Vui lòng nhập mật khẩu';
+                } else if (value.length < 8) {
+                  return 'Mật khẩu phải có ít nhất 8 ký tự';
+                } else if (!RegExp(r'[a-zA-Z]').hasMatch(value) ||
+                    !RegExp(r'[0-9]').hasMatch(value)) {
+                  return 'Mật khẩu phải chứa ít nhất 1 chữ cái và 1 chữ số';
                 }
+
                 return null;
               },
             ),
@@ -242,8 +275,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _repeatPasswordController,
               focusNode: _repeatPasswordFocusNode,
               key: _repeatPasswordKey,
+              maxLength: 50,
+              buildCounter: (context,
+                      {required currentLength,
+                      required isFocused,
+                      maxLength}) =>
+                  null,
+              keyboardType: TextInputType.visiblePassword,
               onEditingComplete: () {
-                  _handleSubmit(context);
+                _handleSubmit(context);
               },
               decoration: InputDecoration(
                 labelText: 'Nhập lại mật khẩu',
@@ -291,9 +331,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               onPressed: () {
                 context.read<AuthBloc>().add(AuthLoginPrefilled(
-                  username: '',
-                  password: '',
-                ));
+                      username: '',
+                      password: '',
+                    ));
                 context.go(RouteName.login);
               },
               child: const Text('Đã có tài khoản? Quay lại đăng nhập',

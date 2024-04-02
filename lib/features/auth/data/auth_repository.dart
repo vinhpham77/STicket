@@ -67,6 +67,12 @@ class AuthRepository {
   // TODO: Implement logout
   Future<Result<void>> logout() async {
     try {
+      final token = await authLocalDataSource.getToken(AuthDataConstants.refreshToken);
+
+      if (token != null) {
+        await authApiClient.logout(token);
+      }
+
       await authLocalDataSource.deleteToken(AuthDataConstants.accessToken);
       await authLocalDataSource.deleteToken(AuthDataConstants.refreshToken);
       return Success(null);

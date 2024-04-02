@@ -7,7 +7,7 @@ final dio = Dio(
   ),
 );
 
-Future<void> setHeaders(Dio dio) async {
+Future<void> setDeviceInfo(Dio dio) async {
   String deviceName = await getDeviceName();
   String deviceId = await getDeviceId();
 
